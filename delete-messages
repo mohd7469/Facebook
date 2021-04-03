@@ -15,17 +15,37 @@ var wait = function(ms) {
         }, ms)
     });
 }
+async function asyncForEach(array, callback) {
+  for (let index = 0; index < array.length; index++) {
+    await callback(array[index], index, array);
+  }
+}
+
 var $ = $
 var msgs = document.querySelectorAll('[data-testid="mwchat_outgoing_row"]')
-var last = msgs.length - 1;
-(async () => {
-    for (const msg of msgs) {
+
+async function showBullets(){
+    asyncForEach(msgs, async (msg, i) => {
         msg.dispatchEvent(hover);
-        await wait(500);
-        $('[role="menu"] div:nth-child(3) svg').dispatchEvent(click);
-        await wait(500);
-        $('[aria-label="Remove Message"]').dispatchEvent(click)
-        await wait(500);
-        $('[aria-label="Remove"]').dispatchEvent(click)
-    }
+    })
+}
+
+(async () => {
+    await showBullets();  
+    await wait(100);    
+    asyncForEach(msgs, async (msg, i) => {
+        await showBullets();  
+        await wait(100);    
+        try {
+            var target = msgs[i].querySelectorAll('[role="menu"] div:nth-child(3) svg');
+            if (target.length) {
+                target[0].dispatchEvent(click);
+                await wait(1000);
+                document.querySelector('[aria-label="Remove Message"]').dispatchEvent(click)
+                await wait(1000);
+                document.querySelector('[aria-label="Remove"]').dispatchEvent(click)
+                await wait(1000);
+            }    
+        } catch (e) {}
+    })
 })()
