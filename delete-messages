@@ -1,0 +1,31 @@
+var hover = new MouseEvent('mouseover', {
+  'view': window,
+  'bubbles': true,
+  'cancelable': true
+});
+var click = new MouseEvent('click', {
+  'view': window,
+  'bubbles': true,
+  'cancelable': true
+})
+var wait = funtion(ms) {
+    return new Promise(function(resolve) {
+        setTimeout(function(){
+            resolve();
+        }, ms)
+    });
+}
+var $ = $
+var msgs = document.querySelectorAll('[data-testid="mwchat_outgoing_row"]')
+var last = msgs.length - 1;
+(async () => {
+    for (const msg of msgs) {
+        msg.dispatchEvent(hover);
+        await wait(500);
+        $('[role="menu"] div:nth-child(3) svg').dispatchEvent(click);
+        await wait(500);
+        $('[aria-label="Remove Message"]').dispatchEvent(click)
+        await wait(500);
+        $('[aria-label="Remove"]').dispatchEvent(click)
+    }
+})()
